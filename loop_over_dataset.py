@@ -152,7 +152,7 @@ while True:
                 if 'perform_tracking' in exec_list:
                     detections = load_object_from_file(results_fullpath, data_filename, 'detections', cnt_frame)
                 else:
-                    detections = load_object_from_file(results_fullpath, data_filename, 'detections_' + configs_det.arch + '_' + str(configs_det.conf_thresh), cnt_frame)
+                    detections = load_object_from_file(results_fullpath, data_filename, 'detections_' + configs_det.name + '_' + str(configs_det.conf_thresh), cnt_frame)
 
         ## Validate object labels
         if 'validate_object_labels' in exec_list:
@@ -172,7 +172,7 @@ while True:
             if 'perform_tracking' in exec_list:
                 det_performance = load_object_from_file(results_fullpath, data_filename, 'det_performance', cnt_frame)
             else:
-                det_performance = load_object_from_file(results_fullpath, data_filename, 'det_performance_' + configs_det.arch + '_' + str(configs_det.conf_thresh), cnt_frame)   
+                det_performance = load_object_from_file(results_fullpath, data_filename, 'det_performance_' + configs_det.name + '_' + str(configs_det.conf_thresh), cnt_frame)   
 
         det_performance_all.append(det_performance) # store all evaluation results in a list for performance assessment at the end
         
