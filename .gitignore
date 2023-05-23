@@ -3,4 +3,7 @@
 *.pyc
 
 /dataset/
+/images/
 /results/
+
+**/pretrained/
