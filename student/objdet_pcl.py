@@ -31,6 +31,8 @@ from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2, lab
 # object detection tools and helper functions
 import misc.objdet_tools as tools
 
+# definition of global variables
+counter_saving = 0
 
 # visualize lidar point-cloud
 def show_pcl(pcl):
