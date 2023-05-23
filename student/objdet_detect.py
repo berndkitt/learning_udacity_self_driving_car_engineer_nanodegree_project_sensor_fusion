@@ -220,12 +220,25 @@ def detect_objects(input_bev_maps, model, configs):
     objects = [] 
 
     ## step 1 : check whether there are any detections
+    if len(detections) > 0:
 
         ## step 2 : loop over all detections
+        for current_detection in detections:
         
             ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
+            # code adapted from "SFA3D" repository (see https://github.com/maudzung/SFA3D.git)
+            score_temp, x_temp, y_temp, z_temp, h_temp, w_temp, l_temp, yaw_temp = current_detection
+            
+            x   = y_temp * configs.discretization_height + configs.lim_x[0]
+            y   = x_temp * configs.discretization_width  + configs.lim_y[0]
+            z   = z_temp + configs.lim_z[0]
+            h   = h_temp * 1.0
+            w   = w_temp * configs.discretization_width
+            l   = l_temp * configs.discretization_height
+            yaw = yaw_temp * (-1.0)
         
             ## step 4 : append the current object to the 'objects' array
+            objects.append([1, x, y, z, h, w, l, yaw])
         
     #######
     ####### ID_S3_EX2 START #######   
