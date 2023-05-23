@@ -40,6 +40,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     ious = []
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
+        ious_current_label = []
         if valid: # exclude all labels from statistics which are not considered valid
             
             # compute intersection over union (iou) and distance between centers
@@ -49,20 +50,52 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             print("student task ID_S4_EX1 ")
 
             ## step 1 : extract the four corners of the current label bounding-box
+            x_label   = label.box.center_x
+            y_label   = label.box.center_y
+            z_label   = label.box.center_z
+            w_label   = label.box.width
+            l_label   = label.box.length
+            yaw_label = label.box.heading
+            
+            corners_label = tools.compute_box_corners(x_label, y_label, w_label, l_label, yaw_label)
             
             ## step 2 : loop over all detected objects
-
+            # TODO: Check whether the type of the label and the type of the detection matches (i.e. do not compare bicycles and vehicles etc.)            
+            for detection in detections:
                 ## step 3 : extract the four corners of the current detection
+                x_detection   = detection[1]
+                y_detection   = detection[2]
+                z_detection   = detection[3]
+                w_detection   = detection[5]
+                l_detection   = detection[6]
+                yaw_detection = detection[7]
+            
+                corners_detection = tools.compute_box_corners(x_detection, y_detection, w_detection, l_detection, yaw_detection)
                 
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
+                distance_center_x = np.sqrt((x_label - x_detection)**2)
+                distance_center_y = np.sqrt((y_label - y_detection)**2)
+                distance_center_z = np.sqrt((z_label - z_detection)**2)
                 
                 ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
+                polygon_label     = Polygon(corners_label)
+                polygon_detection = Polygon(corners_detection)
+                
+                area_intersection = polygon_label.intersection(polygon_detection).area
+                area_union        = polygon_label.union(polygon_detection).area
+                
+                iou = area_intersection / area_union
+                
+                ious_current_label.append(iou)
                 
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
+                if iou > min_iou:
+                    matches_lab_det.append([iou, distance_center_x, distance_center_y, distance_center_z])
+                    true_positives += 1
                 
             #######
-            ####### ID_S4_EX1 END #######     
-            
+            ####### ID_S4_EX1 END #######    
+  
         # find best match and compute metrics
         if matches_lab_det:
             best_match = max(matches_lab_det,key=itemgetter(1)) # retrieve entry with max iou in case of multiple candidates   
