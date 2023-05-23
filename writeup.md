@@ -1,6 +1,6 @@
 # Writeup: 3D Object Detection (Mid-Term Project)
 
-The goal of the mid-term project was to make use of lidar measurements provided by a Velodine laser-scanner mounted on top of a vehicle, to detect objects in the surroundings of the vehicle's environment. This task was split into the following sub-tasks:
+The goal of the mid-term project was to make use of lidar measurements provided by a Velodyne laser-scanner mounted on top of a vehicle, to detect objects in the surroundings of the vehicle's environment. This task was split into the following sub-tasks:
 
 1) Computing the 3D point-cloud out of the range image provided by the laser-scanner
     - Extracting the intensity and height channel from the range image
@@ -21,24 +21,32 @@ Below, a brief description of the different steps as well as some results can be
 
 ## Computing the 3D point-cloud out of the range image provided by the laser-scanner
 
+The starting point for detecting objects in measurements created by a laser-scanner is the so called range image. It is basically a panoramic view of the scene, which encodes the intensity of the reflected light, the distance, and the elongation of a 3D point.
+
+In this task, the range and the intensity channel of the range image had to be extracted. One very important step is to identify points without a valid reflection, those are marked with the value "-1". Another very important step is to reduce the impact of highly reflecting objects. Those can create very high intensity values which would make the other reflection "invisible" in the intensity map as their value is too low. In the implementation, the percentiles P1 and P99 have been applied. Hence, intensity values with a value lower than P1 have been set to the P1 values. Intensity values higher than P99 have been set to the P99 value. Finally, the values had to be normalized
+
+Another information which can be extracted from the range image is the distance of the 3D points w.r.t. the laser-scanner. As for the intensity layer, invalid values had to be identified and removed and the remaining values had to be normalized.
+
+An example of the resulting intensity and range layers can be seen in Figure 1.
+
 <p align="center"><img src="writeup/S1_F100_Range_Image.png"/></p>
-<p align="center">Range (top) and intensity (bottom) channel [Sequence 1, Frame 100].</p>
+<p align="center">Figure 1: Range (top) and intensity (bottom) channel [Sequence 1, Frame 100].</p>
 
 <p align="center"><img src="writeup/S1_F100_Point_Cloud.png"/></p>
-<p align="center">3D point cloud [Sequence 1, Frame 100].</p>
+<p align="center">Figure 2: 3D point cloud [Sequence 1, Frame 100].</p>
 
 ## Computing the bird's eye view from the 3D point cloud
 
 ## Object detection in the bird's eye view
 
 <p align="center"><img src="writeup/S1_F100_Intensity_Map.png"/></p>
-<p align="center">Intensity layer of the bird's eye view [Sequence 1, Frame 100].</p>
+<p align="center">Figure 3: Intensity layer of the bird's eye view [Sequence 1, Frame 100].</p>
 
 <p align="center"><img src="writeup/S1_F100_Height_Map.png"/></p>
-<p align="center">Height layer of the bird's eye view [Sequence 1, Frame 100].</p>
+<p align="center">Figure 4: Height layer of the bird's eye view [Sequence 1, Frame 100].</p>
 
 <p align="center"><img src="writeup/S1_F100_Detected_Objects.png"/></p>
-<p align="center">Detected objects [Sequence 1, Frame 100].</p>
+<p align="center">Figure 5: Detected objects [Sequence 1, Frame 100].</p>
 
 ## Performance evaluation of the detection algorithm
 
