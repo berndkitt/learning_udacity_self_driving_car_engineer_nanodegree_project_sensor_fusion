@@ -38,6 +38,8 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     true_positives = 0 # no. of correctly detected objects
     center_devs = []
     ious = []
+    iou_matrix = []
+    
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
         ious_current_label = []
@@ -94,7 +96,9 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                     true_positives += 1
                 
             #######
-            ####### ID_S4_EX1 END #######    
+            ####### ID_S4_EX1 END #######
+        
+            iou_matrix.append(ious_current_label)   
   
         # find best match and compute metrics
         if matches_lab_det:
@@ -110,13 +114,33 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     # compute positives and negatives for precision/recall
     
     ## step 1 : compute the total number of positives present in the scene
-    all_positives = 0
+    all_positives = 0 # will be calculated further down
 
     ## step 2 : compute the number of false negatives
+    # FN: a label where no detection is (i.e. the threshold for the IoU is not met for any detection)
     false_negatives = 0
+    
+    for i_label in range(0, len(iou_matrix)):
+        if max(iou_matrix[i_label]) < min_iou:
+            false_negatives += 1
 
     ## step 3 : compute the number of false positives
+    # FP: a detection where no label is (i.e. the threshold for the IoU is not met for any label)
     false_positives = 0
+    
+    num_labels     = len(iou_matrix)
+    num_detections = len(iou_matrix[0])
+    
+    for i_detection in range(0, num_detections):
+        ious_current_detection = []
+        
+        for i_label in range(0, num_labels):
+            ious_current_detection.append(iou_matrix[i_label][i_detection])
+        
+        if max(ious_current_detection) < min_iou:
+            false_positives += 1
+    
+    all_positives = true_positives + false_positives
     
     #######
     ####### ID_S4_EX2 END #######     
