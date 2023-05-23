@@ -114,7 +114,10 @@ def load_configs(model_name='fpn_resnet', configs=None):
     configs.lim_z = [-1, 3]
     configs.lim_r = [0, 1.0] # reflected lidar intensity
     configs.bev_width = 608  # pixel resolution of bev image
-    configs.bev_height = 608 
+    configs.bev_height = 608
+    
+    # performance evaluation
+    configs.min_iou = 0.5
 
     # add model-dependent parameters
     configs = load_configs_model(model_name, configs)

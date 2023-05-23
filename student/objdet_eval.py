@@ -38,8 +38,11 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     true_positives = 0 # no. of correctly detected objects
     center_devs = []
     ious = []
+    iou_matrix = []
+    
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
+        ious_current_label = []
         if valid: # exclude all labels from statistics which are not considered valid
             
             # compute intersection over union (iou) and distance between centers
@@ -49,20 +52,54 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             print("student task ID_S4_EX1 ")
 
             ## step 1 : extract the four corners of the current label bounding-box
+            x_label   = label.box.center_x
+            y_label   = label.box.center_y
+            z_label   = label.box.center_z
+            w_label   = label.box.width
+            l_label   = label.box.length
+            yaw_label = label.box.heading
+            
+            corners_label = tools.compute_box_corners(x_label, y_label, w_label, l_label, yaw_label)
             
             ## step 2 : loop over all detected objects
-
+            # TODO: Check whether the type of the label and the type of the detection matches (i.e. do not compare bicycles and vehicles etc.)            
+            for detection in detections:
                 ## step 3 : extract the four corners of the current detection
+                x_detection   = detection[1]
+                y_detection   = detection[2]
+                z_detection   = detection[3]
+                w_detection   = detection[5]
+                l_detection   = detection[6]
+                yaw_detection = detection[7]
+            
+                corners_detection = tools.compute_box_corners(x_detection, y_detection, w_detection, l_detection, yaw_detection)
                 
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
+                distance_center_x = np.sqrt((x_label - x_detection)**2)
+                distance_center_y = np.sqrt((y_label - y_detection)**2)
+                distance_center_z = np.sqrt((z_label - z_detection)**2)
                 
                 ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
+                polygon_label     = Polygon(corners_label)
+                polygon_detection = Polygon(corners_detection)
+                
+                area_intersection = polygon_label.intersection(polygon_detection).area
+                area_union        = polygon_label.union(polygon_detection).area
+                
+                iou = area_intersection / area_union
+                
+                ious_current_label.append(iou)
                 
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
+                if iou > min_iou:
+                    matches_lab_det.append([iou, distance_center_x, distance_center_y, distance_center_z])
+                    true_positives += 1
                 
             #######
-            ####### ID_S4_EX1 END #######     
-            
+            ####### ID_S4_EX1 END #######
+        
+            iou_matrix.append(ious_current_label)   
+  
         # find best match and compute metrics
         if matches_lab_det:
             best_match = max(matches_lab_det,key=itemgetter(1)) # retrieve entry with max iou in case of multiple candidates   
@@ -77,13 +114,33 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     # compute positives and negatives for precision/recall
     
     ## step 1 : compute the total number of positives present in the scene
-    all_positives = 0
+    all_positives = 0 # will be calculated further down
 
     ## step 2 : compute the number of false negatives
+    # FN: a label where no detection is (i.e. the threshold for the IoU is not met for any detection)
     false_negatives = 0
+    
+    for i_label in range(0, len(iou_matrix)):
+        if max(iou_matrix[i_label]) < min_iou:
+            false_negatives += 1
 
     ## step 3 : compute the number of false positives
+    # FP: a detection where no label is (i.e. the threshold for the IoU is not met for any label)
     false_positives = 0
+    
+    num_labels     = len(iou_matrix)
+    num_detections = len(iou_matrix[0])
+    
+    for i_detection in range(0, num_detections):
+        ious_current_detection = []
+        
+        for i_label in range(0, num_labels):
+            ious_current_detection.append(iou_matrix[i_label][i_detection])
+        
+        if max(ious_current_detection) < min_iou:
+            false_positives += 1
+    
+    all_positives = true_positives + false_positives
     
     #######
     ####### ID_S4_EX2 END #######     
@@ -111,12 +168,22 @@ def compute_performance_stats(det_performance_all):
     print('student task ID_S4_EX3')
 
     ## step 1 : extract the total number of positives, true positives, false negatives and false positives
+    total_all_positives   = 0
+    total_true_positives  = 0
+    total_false_negatives = 0
+    total_false_positives = 0
+    
+    for i_frame in range(0, len(pos_negs)):
+        total_all_positives   += pos_negs[i_frame][0]
+        total_true_positives  += pos_negs[i_frame][1]
+        total_false_negatives += pos_negs[i_frame][2]
+        total_false_positives += pos_negs[i_frame][3]
     
     ## step 2 : compute precision
-    precision = 0.0
+    precision = total_true_positives / total_all_positives
 
     ## step 3 : compute recall 
-    recall = 0.0
+    recall = total_true_positives / (total_true_positives + total_false_negatives)
 
     #######    
     ####### ID_S4_EX3 END #######     
