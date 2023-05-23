@@ -69,6 +69,16 @@ def show_range_image(frame, lidar_name):
         range_image.ParseFromString(zlib.decompress(lidar.ri_return1.range_image_compressed))
         range_image = np.array(range_image.data).reshape(range_image.shape.dims)
     
+    # crop image to +/-90 degrees
+    range_image_num_columns    = range_image.shape[1]
+    angular_resolution         = 360.0 / range_image_num_columns # angular "area" covered by one column of the range image
+    num_columns_for_90_degrees = int(np.floor(90.0 / angular_resolution))
+    center_column              = int(np.floor(range_image_num_columns / 2))
+    column_90_degrees_left     = center_column - num_columns_for_90_degrees;
+    column_90_degrees_right    = center_column + num_columns_for_90_degrees
+    
+    range_image = range_image[:, column_90_degrees_left:column_90_degrees_right]
+    
     # step 2 : extract the range and the intensity channel from the range image
     range_channel     = range_image[:, :, 0]
     intensity_channel = range_image[:, :, 1]
