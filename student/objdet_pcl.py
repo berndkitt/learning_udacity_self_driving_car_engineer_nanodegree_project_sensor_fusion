@@ -41,6 +41,11 @@ def show_pcl(pcl):
 
     def callback_function_next_frame(visualizer):
         visualizer.close()
+    
+    def callback_save_to_image(visualizer):
+        global counter_saving
+        visualizer.capture_screen_image(f'./images/img_{counter_saving:05d}.png')
+        counter_saving += 1
 
     # step 1 : initialize open3d with key callback and create window
     # create visualizer
@@ -60,6 +65,7 @@ def show_pcl(pcl):
     
     # step 5 : visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
     visualizer.register_key_callback(262, callback_function_next_frame)
+    visualizer.register_key_callback(ord("S"), callback_save_to_image)
     visualizer.run()
 
     #######
