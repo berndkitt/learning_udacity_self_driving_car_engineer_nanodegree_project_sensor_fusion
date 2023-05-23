@@ -1,2 +1,6 @@
+.DS_Store
+*.pth
+*.pyc
+
 /dataset/
 /results/
