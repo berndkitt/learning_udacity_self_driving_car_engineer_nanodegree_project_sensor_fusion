@@ -14,6 +14,7 @@
 import cv2
 import numpy as np
 import torch
+import zlib
 
 # add project directory to python path to enable relative imports
 import os
@@ -59,18 +60,44 @@ def show_range_image(frame, lidar_name):
     print("student task ID_S1_EX1")
 
     # step 1 : extract lidar data and range image for the roof-mounted lidar
+    # extract lidar data for selected lidar
+    lidar = [obj for obj in frame.lasers if obj.name == lidar_name][0]
+    
+    # extract range image (first response only) and resahpe the image
+    if len(lidar.ri_return1.range_image_compressed) > 0:
+        range_image = dataset_pb2.MatrixFloat()
+        range_image.ParseFromString(zlib.decompress(lidar.ri_return1.range_image_compressed))
+        range_image = np.array(range_image.data).reshape(range_image.shape.dims)
     
     # step 2 : extract the range and the intensity channel from the range image
+    range_channel     = range_image[:, :, 0]
+    intensity_channel = range_image[:, :, 1]
     
     # step 3 : set values <0 to zero
+    range_channel[range_channel < 0.0]         = 0.0 # removal of invalid entries (as they have a value of -1.0)
+    intensity_channel[intensity_channel < 0.0] = 0.0 # removal of invalid entries (as they have a value of -1.0)
     
     # step 4 : map the range channel onto an 8-bit scale and make sure that the full range of values is appropriately considered
+    range_channel = range_channel * 255 / (np.amax(range_channel) - np.amin(range_channel)) # make sure, that the entire range of an 8-bit image is considered
+    range_channel = np.uint8(range_channel)
     
     # step 5 : map the intensity channel onto an 8-bit scale and normalize with the difference between the 1- and 99-percentile to mitigate the influence of outliers
+    intensity_channel_as_vector = intensity_channel.flatten()
+    intensity_channel_as_vector_sorted = np.sort(intensity_channel_as_vector)
+    
+    index_entries_1_percent  = int(len(intensity_channel_as_vector_sorted) * 0.01)
+    index_entries_99_percent = int(len(intensity_channel_as_vector_sorted) * 0.99)
+    
+    # calculate percentiles
+    value_percentile_1  = intensity_channel_as_vector_sorted[index_entries_1_percent]
+    value_percentile_99 = intensity_channel_as_vector_sorted[index_entries_99_percent]
+    
+    intensity_channel = intensity_channel * 255 / (value_percentile_99 - value_percentile_1)
+    intensity_channel = np.uint8(intensity_channel)
     
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
-    
-    img_range_intensity = [] # remove after implementing all steps
+    img_range_intensity = np.vstack((range_channel, intensity_channel))
+
     #######
     ####### ID_S1_EX1 END #######     
     
