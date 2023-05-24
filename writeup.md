@@ -10,7 +10,7 @@ The goal of the mid-term project was to make use of lidar measurements provided 
     - Computing the intensity layer
     - Computing the height layer
 3) Object detection in the bird's eye view
-    - Evaluating FPN ResNet for object detection
+    - Evaluating "FPN ResNet" for object detection
     - Extracting the bounding boxes from the model output
 4) Performance evaluation of the detection algorithm
     - Computing the intersection-over-union between labels and detections
@@ -32,7 +32,7 @@ Examples of the resulting intensity and range layers can be seen in Figure 1.
 <p align="center"><img src="writeup/S1_F100_Range_Image.png"/></p>
 <p align="center">Figure 1: Range (top) and intensity (bottom) layer [Sequence 1, Frame 100].</p>
 
-The next stop of the processing chain was to visualize the 3D point cloud. The points themselves were available already, the visualization had to be implemented. This was done using the Open3D toolbox.
+The next step of the processing chain was to visualize the 3D point cloud. The points themselves were available already, the visualization had to be implemented. This was done using the Open3D toolbox.
 
 An example of a 3D point cloud can be seen in Figure 2.
 
@@ -87,21 +87,26 @@ These two metrics can be used to evaluate the performance of an object detection
 ## Examples of vehicles with different degrees of visibility
 
 <p align="center"><img src="writeup/S1_F0_Point_Cloud.png"/></p>
-<p align="center">Vehicles with mainly the rear visible and a close vehicle with rear and side visible [Sequence 1, Frame 0].</p>
+<p align="center">Figure 7: Vehicles with mainly the rear visible and a close vehicle with rear and side visible [Sequence 1, Frame 0].</p>
 
 <p align="center"><img src="writeup/S1_F3_Point_Cloud.png"/></p>
-<p align="center">Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
+<p align="center">Figure 8: Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
 
 <p align="center"><img src="writeup/S1_F49_Point_Cloud.png"/></p>
-<p align="center">Good visibility of the front and the side of the vehicle. [Sequence 1, Frame 49].</p>
+<p align="center">Figure 9: Good visibility of the front and the side of the vehicle [Sequence 1, Frame 49].</p>
 
 <p align="center"><img src="writeup/S2_F100_Point_Cloud.png"/></p>
-<p align="center">Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
+<p align="center">Figure 10: Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
 
 <p align="center"><img src="writeup/S3_F0_Point_Cloud.png"/></p>
-<p align="center">Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
+<p align="center">Figure 11: Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
 
 <p align="center"><img src="writeup/S3_F30_Point_Cloud.png"/></p>
-<p align="center">Decreasing visibility depending on the distance of the vehicles (vehicles passed the ego-vehicle) [Sequence 3, Frame 30].</p>
+<p align="center">Figure 12: Decreasing visibility depending on the distance of the vehicles (vehicles passed the ego-vehicle) [Sequence 3, Frame 30].</p>
 
 ## Examples of stable vehicle features
+
+Based on the 3D point clouds shown in Figures 7-11 as well as the intensity layer extracted from the range image (see Figure 1, bottom), the following features appear rather stable:
+- Roof of the vehicles: They can be clearly identified as they are usually the highest part of the vehicles. Hence, they stand out in the 3D point cloud.
+- Window of the vehicles: The intensity of the reflected light is pretty low due to the transparency of the windows. Hence, they appear dark in the intensity layer.
+- Body of the vehicles: As the body of the vehicles is usually made up of metal, it also shows a high reflectivity in the intensity layer of the range image.
