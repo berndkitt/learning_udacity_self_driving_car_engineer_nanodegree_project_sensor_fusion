@@ -83,3 +83,25 @@ Additionally, two more values had to be calculated. On the one hand, the number 
 Using those numbers, two important performance metrics for object detection algorithms can be calculated: Precision and Recall.
 
 These two metrics can be used to evaluate the performance of an object detection algorithm and to compare different algorithms against each other.
+
+## Examples of vehicles with different degrees of visibility
+
+<p align="center"><img src="writeup/S1_F0_Point_Cloud.png"/></p>
+<p align="center">Vehicles with mainly the rear visible and a close vehicle with rear and side visible [Sequence 1, Frame 0].</p>
+
+<p align="center"><img src="writeup/S1_F3_Point_Cloud.png"/></p>
+<p align="center">Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
+
+<p align="center"><img src="writeup/S1_F49_Point_Cloud.png"/></p>
+<p align="center">Good visibility of the front and the side of the vehicle. [Sequence 1, Frame 49].</p>
+
+<p align="center"><img src="writeup/S2_F100_Point_Cloud.png"/></p>
+<p align="center">Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
+
+<p align="center"><img src="writeup/S3_F0_Point_Cloud.png"/></p>
+<p align="center">Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
+
+<p align="center"><img src="writeup/S3_F30_Point_Cloud.png"/></p>
+<p align="center">Decreasing visibility depending on the distance of the vehicles (vehicles passed the ego-vehicle) [Sequence 3, Frame 30].</p>
+
+## Examples of stable vehicle features
