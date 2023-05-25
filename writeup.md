@@ -84,37 +84,48 @@ Using those numbers, two important performance metrics for object detection algo
 
 These two metrics can be used to evaluate the performance of an object detection algorithm and to compare different algorithms against each other.
 
+Figures 7-9 show the detection performance of the algorithm evaluated on the three sequences used in this project.
+
+<p align="center"><img src="writeup/S1_Detection_Performance.png"/></p>
+<p align="center">Figure 7: Detection performance for sequence 1.</p>
+
+<p align="center"><img src="writeup/S2_Detection_Performance.png"/></p>
+<p align="center">Figure 8: Detection performance for sequence 2.</p>
+
+<p align="center"><img src="writeup/S3_Detection_Performance.png"/></p>
+<p align="center">Figure 9: Detection performance for sequence 3.</p>
+
 ## Examples of vehicles with different degrees of visibility
 
 <p align="center"><img src="writeup/S1_F0_Point_Cloud.png"/></p>
-<p align="center">Figure 7: Vehicles with mainly the rear visible and a close vehicle with rear and side visible [Sequence 1, Frame 0].</p>
+<p align="center">Figure 10: Vehicles with mainly the rear visible and a close vehicle with rear and side visible [Sequence 1, Frame 0].</p>
 
 <p align="center"><img src="writeup/S1_F3_Point_Cloud.png"/></p>
-<p align="center">Figure 8: Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
+<p align="center">Figure 11: Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
 
 <p align="center"><img src="writeup/S1_F49_Point_Cloud_1.png"/></p>
-<p align="center">Figure 9: Good visibility of the front and the side of the vehicle [Sequence 1, Frame 49].</p>
+<p align="center">Figure 12: Good visibility of the front and the side of the vehicle [Sequence 1, Frame 49].</p>
 
 <p align="center"><img src="writeup/S2_F100_Point_Cloud.png"/></p>
-<p align="center">Figure 10: Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
+<p align="center">Figure 13: Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
 
 <p align="center"><img src="writeup/S3_F0_Point_Cloud_1.png"/></p>
-<p align="center">Figure 11: Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
+<p align="center">Figure 14: Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
 
 <p align="center"><img src="writeup/S3_F30_Point_Cloud.png"/></p>
-<p align="center">Figure 12: Decreasing visibility depending on the distance of the vehicles (vehicles passed the ego-vehicle) [Sequence 3, Frame 30].</p>
+<p align="center">Figure 15: Decreasing visibility depending on the distance of the vehicles (vehicles passed the ego-vehicle) [Sequence 3, Frame 30].</p>
 
 ## Examples of stable vehicle features
 
-Based on the 3D point clouds shown in Figures 7-11 as well as the intensity layer extracted from the range image (see Figure 1, bottom), the following features appear rather stable:
+Based on the 3D point clouds shown in Figures 10-15 as well as the intensity layer extracted from the range image (see Figure 1, bottom), the following features appear rather stable:
 - Roof of the vehicles: They can be clearly identified as they are usually the highest part of the vehicles. Hence, they stand out in the 3D point cloud.
 - Window of the vehicles: The intensity of the reflected light is pretty low due to the transparency of the windows. Hence, they appear dark in the intensity layer.
 - Body of the vehicles: As the body of the vehicles is usually made up of metal, it also shows a high reflectivity in the intensity layer of the range image.
 
-Prominent features in the 3D point cloud which remain stable across different frames are shown Figure 13 and Figure 14.
+Prominent features in the 3D point cloud which remain stable across different frames are shown Figure 16 and Figure 17.
 
 <p align="center"><img src="writeup/S1_F49_Point_Cloud_2_Detail_modified.png"/></p>
-<p align="center">Figure 13: Prominent features in the 3D point cloud [Sequence 1, Frame 49].</p>
+<p align="center">Figure 16: Prominent features in the 3D point cloud [Sequence 1, Frame 49].</p>
 
 <p align="center"><img src="writeup/S3_F0_Point_Cloud_2_Detail_modified.png"/></p>
-<p align="center">Figure 14: Prominent features in the 3D point cloud [Sequence 3, Frame 0].</p>
+<p align="center">Figure 17: Prominent features in the 3D point cloud [Sequence 3, Frame 0].</p>
