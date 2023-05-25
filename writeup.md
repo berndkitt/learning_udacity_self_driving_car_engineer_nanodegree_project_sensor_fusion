@@ -92,13 +92,13 @@ These two metrics can be used to evaluate the performance of an object detection
 <p align="center"><img src="writeup/S1_F3_Point_Cloud.png"/></p>
 <p align="center">Figure 8: Vehicles with mainly the front and side visible [Sequence 1, Frame 3].</p>
 
-<p align="center"><img src="writeup/S1_F49_Point_Cloud.png"/></p>
+<p align="center"><img src="writeup/S1_F49_Point_Cloud_1.png"/></p>
 <p align="center">Figure 9: Good visibility of the front and the side of the vehicle [Sequence 1, Frame 49].</p>
 
 <p align="center"><img src="writeup/S2_F100_Point_Cloud.png"/></p>
 <p align="center">Figure 10: Vehicle mainly seen from the side and one in far distance from the rear [Sequence 2, Frame 100].</p>
 
-<p align="center"><img src="writeup/S3_F0_Point_Cloud.png"/></p>
+<p align="center"><img src="writeup/S3_F0_Point_Cloud_1.png"/></p>
 <p align="center">Figure 11: Decreasing visibility depending on the distance of the vehicles [Sequence 3, Frame 0].</p>
 
 <p align="center"><img src="writeup/S3_F30_Point_Cloud.png"/></p>
@@ -110,3 +110,11 @@ Based on the 3D point clouds shown in Figures 7-11 as well as the intensity laye
 - Roof of the vehicles: They can be clearly identified as they are usually the highest part of the vehicles. Hence, they stand out in the 3D point cloud.
 - Window of the vehicles: The intensity of the reflected light is pretty low due to the transparency of the windows. Hence, they appear dark in the intensity layer.
 - Body of the vehicles: As the body of the vehicles is usually made up of metal, it also shows a high reflectivity in the intensity layer of the range image.
+
+Prominent features in the 3D point cloud which remain stable across different frames are shown Figure 13 and Figure 14.
+
+<p align="center"><img src="writeup/S1_F49_Point_Cloud_2_Detail_modified.png"/></p>
+<p align="center">Figure 13: Prominent features in the 3D point cloud [Sequence 1, Frame 49].</p>
+
+<p align="center"><img src="writeup/S3_F0_Point_Cloud_2_Detail_modified.png"/></p>
+<p align="center">Figure 14: Prominent features in the 3D point cloud [Sequence 3, Frame 0].</p>
