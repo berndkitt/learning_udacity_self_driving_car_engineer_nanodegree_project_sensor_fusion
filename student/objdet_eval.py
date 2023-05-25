@@ -38,11 +38,9 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     true_positives = 0 # no. of correctly detected objects
     center_devs = []
     ious = []
-    iou_matrix = []
     
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
-        ious_current_label = []
         if valid: # exclude all labels from statistics which are not considered valid
             
             # compute intersection over union (iou) and distance between centers
@@ -88,8 +86,6 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 
                 iou = area_intersection / area_union
                 
-                ious_current_label.append(iou)
-                
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
                 if iou > min_iou:
                     matches_lab_det.append([iou, distance_center_x, distance_center_y, distance_center_z])
@@ -97,8 +93,6 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 
             #######
             ####### ID_S4_EX1 END #######
-        
-            iou_matrix.append(ious_current_label)   
   
         # find best match and compute metrics
         if matches_lab_det:
@@ -114,33 +108,15 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     # compute positives and negatives for precision/recall
     
     ## step 1 : compute the total number of positives present in the scene
-    all_positives = 0 # will be calculated further down
+    all_positives = labels_valid.sum() # updated according to review comment
 
     ## step 2 : compute the number of false negatives
     # FN: a label where no detection is (i.e. the threshold for the IoU is not met for any detection)
-    false_negatives = 0
-    
-    for i_label in range(0, len(iou_matrix)):
-        if max(iou_matrix[i_label]) < min_iou:
-            false_negatives += 1
+    false_negatives = all_positives - true_positives # missed detections (all_positives contains the number of labeled objects, subtracting the detected object results in the missed objects, i.e. the false negatives)
 
     ## step 3 : compute the number of false positives
     # FP: a detection where no label is (i.e. the threshold for the IoU is not met for any label)
-    false_positives = 0
-    
-    num_labels     = len(iou_matrix)
-    num_detections = len(iou_matrix[0])
-    
-    for i_detection in range(0, num_detections):
-        ious_current_detection = []
-        
-        for i_label in range(0, num_labels):
-            ious_current_detection.append(iou_matrix[i_label][i_detection])
-        
-        if max(ious_current_detection) < min_iou:
-            false_positives += 1
-    
-    all_positives = true_positives + false_positives
+    false_positives = len(detections) - true_positives # detections without label (len(detections) represents the total number of detections, subtracting the true positives results in the detections without a label, i.e. the false positives)
     
     #######
     ####### ID_S4_EX2 END #######     
@@ -180,7 +156,7 @@ def compute_performance_stats(det_performance_all):
         total_false_positives += pos_negs[i_frame][3]
     
     ## step 2 : compute precision
-    precision = total_true_positives / total_all_positives
+    precision = total_true_positives / (total_true_positives + total_false_positives)
 
     ## step 3 : compute recall 
     recall = total_true_positives / (total_true_positives + total_false_negatives)
