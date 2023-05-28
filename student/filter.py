@@ -99,11 +99,13 @@ class Filter:
     def update(self, track, meas):
         ############
         # TODO Step 1: update state x and covariance P with associated measurement, save x and P in track
-        ############        
-        K = track.P * self.H().transpose() * np.linalg.inv(self.S(track, meas, self.H()))
+        ############
+        x = track.x
+        
+        K = track.P * meas.sensor.get_H(x).transpose() * np.linalg.inv(self.S(track, meas, meas.sensor.get_H(x)))
         
         track.x = track.x + K * self.gamma(track, meas)
-        track.P = (np.eye(params.dim_state) - K * self.H()) * track.P
+        track.P = (np.eye(params.dim_state) - K * meas.sensor.get_H(x)) * track.P
         
         ############
         # END student code
@@ -124,7 +126,7 @@ class Filter:
         z_veh_homogeneous = meas.sensor.sens_to_veh * z_sens_homogeneous
         z_veh = z_veh_homogeneous[0:3, 0]
         
-        gamma = z_veh - self.H() * track.x        
+        gamma = z_veh - meas.sensor.get_hx(track.x)
 
         return gamma
         
@@ -143,9 +145,3 @@ class Filter:
         ############
         # END student code
         ############
-    
-    def H(self):
-        H = np.zeros((3, params.dim_state))
-        H[0:3, 0:3] = np.eye(3)
-        
-        return H
