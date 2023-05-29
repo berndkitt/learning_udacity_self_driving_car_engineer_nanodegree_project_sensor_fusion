@@ -127,9 +127,9 @@ class Trackmanagement:
         # - track is initialized AND score is below thresh_initialized
         # - variance of p_x is above a threshold
         # - variance of p_y is above a threshold
-        thresh_confirmed   = params.delete_threshold
-        thresh_tentative   = 0.17
-        thresh_initialized = 0.1
+        thresh_confirmed   = params.delete_threshold_confirmed
+        thresh_tentative   = params.delete_threshold_tentative
+        thresh_initialized = params.delete_threshold_initialized
         
         for track in self.track_list:
             if ((track.state == 'confirmed') and (track.score < thresh_confirmed)) or ((track.state == 'tentative') and (track.score < thresh_tentative)) or ((track.state == 'initialized') and (track.score < thresh_initialized)) or (track.P[0, 0] > params.max_P) or (track.P[1, 1] > params.max_P):
@@ -163,15 +163,13 @@ class Trackmanagement:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
         ############
-        tentative_threshold = 0.2 #
-        
         new_track_score = track.score + 1.0 / params.window
         
         track.score = min(1.0, new_track_score) # limit score to the maximum of 1.0
 
         if track.score > params.confirmed_threshold:
             track.state = 'confirmed'
-        elif track.score > tentative_threshold:
+        elif track.score > params.tentative_threshold:
             track.state = 'tentative'
         else:
             pass # do nothing
