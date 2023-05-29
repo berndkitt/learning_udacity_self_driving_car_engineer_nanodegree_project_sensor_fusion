@@ -116,17 +116,7 @@ class Filter:
         ############
         # TODO Step 1: calculate and return residual gamma
         ############
-        z_sens_homogeneous = np.zeros([4, 1])
-        
-        z_sens_homogeneous[0, 0] = meas.z[0, 0]
-        z_sens_homogeneous[1, 0] = meas.z[1, 0]
-        z_sens_homogeneous[2, 0] = meas.z[2, 0]
-        z_sens_homogeneous[3, 0] = 1.0
-        
-        z_veh_homogeneous = meas.sensor.sens_to_veh * z_sens_homogeneous
-        z_veh = z_veh_homogeneous[0:3, 0]
-        
-        gamma = z_veh - meas.sensor.get_hx(track.x)
+        gamma = meas.z - meas.sensor.get_hx(track.x)
 
         return gamma
         
