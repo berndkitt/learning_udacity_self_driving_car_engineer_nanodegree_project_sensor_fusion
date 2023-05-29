@@ -34,21 +34,32 @@ class Track:
         # unassigned measurement transformed from sensor to vehicle coordinates
         # - initialize track state and track score with appropriate values
         ############
+        z_sens_homogeneous = np.zeros([4, 1])
+        
+        z_sens_homogeneous[0, 0] = meas.z[0, 0]
+        z_sens_homogeneous[1, 0] = meas.z[1, 0]
+        z_sens_homogeneous[2, 0] = meas.z[2, 0]
+        z_sens_homogeneous[3, 0] = 1.0
+        
+        z_veh_homogeneous = meas.sensor.sens_to_veh * z_sens_homogeneous
+        z_veh = z_veh_homogeneous[0:3, 0]
 
-        self.x = np.matrix([[49.53980697],
-                        [ 3.41006279],
-                        [ 0.91790581],
-                        [ 0.        ],
-                        [ 0.        ],
-                        [ 0.        ]])
-        self.P = np.matrix([[9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 6.4e-03, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
+        self.x = np.matrix([[z_veh[0, 0]],
+                            [z_veh[1, 0]],
+                            [z_veh[2, 0]],
+                            [0.0        ],
+                            [0.0        ],
+                            [0.0        ]])
+        
+        self.P = np.zeros((params.dim_state, params.dim_state))
+        
+        self.P[0:3, 0:3] = M_rot * meas.R * M_rot.transpose()
+        self.P[3, 3] = params.sigma_p44
+        self.P[4, 4] = params.sigma_p55
+        self.P[5, 5] = params.sigma_p66
+        
+        self.state = 'initialized'
+        self.score = 1.0 / params.window
         
         ############
         # END student code
@@ -105,11 +116,24 @@ class Trackmanagement:
             track = self.track_list[i]
             # check visibility    
             if meas_list: # if not empty
-                if meas_list[0].sensor.in_fov(track.x):
+                if meas_list[0].sensor.in_fov(track.x): # only decrease the score of tracks visible in the sensor's field of view
                     # your code goes here
-                    pass 
+                    track.score = track.score - (1.0 / params.window)
 
-        # delete old tracks   
+        # delete old tracks
+        # conditions to delete a track (one condition is sufficient to delete a track)
+        # - track is confirmed AND score is below thresh_confirmed
+        # - track is tentative AND score is below thresh_tentative
+        # - track is initialized AND score is below thresh_initialized
+        # - variance of p_x is above a threshold
+        # - variance of p_y is above a threshold
+        thresh_confirmed   = params.delete_threshold
+        thresh_tentative   = 0.17
+        thresh_initialized = 0.1
+        
+        for track in self.track_list:
+            if ((track.state == 'confirmed') and (track.score < thresh_confirmed)) or ((track.state == 'tentative') and (track.score < thresh_tentative)) or ((track.state == 'initialized') and (track.score < thresh_initialized)) or (track.P[0, 0] > params.max_P) or (track.P[1, 1] > params.max_P):
+                self.delete_track(track)
 
         ############
         # END student code
@@ -139,8 +163,18 @@ class Trackmanagement:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
         ############
+        tentative_threshold = 0.2 #
+        
+        new_track_score = track.score + 1.0 / params.window
+        
+        track.score = min(1.0, new_track_score) # limit score to the maximum of 1.0
 
-        pass
+        if track.score > params.confirmed_threshold:
+            track.state = 'confirmed'
+        elif track.score > tentative_threshold:
+            track.state = 'tentative'
+        else:
+            pass # do nothing
         
         ############
         # END student code
