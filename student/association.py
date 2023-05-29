@@ -131,7 +131,7 @@ class Association:
         # TODO Step 3: calculate and return Mahalanobis distance
         ############
         # get H matrix from sensor
-        H = meas.sensor.get_H(track)
+        H = meas.sensor.get_H(track.x)
         
         # calculate covariance matrix of the residual
         S = KF.S(track, meas, H)
