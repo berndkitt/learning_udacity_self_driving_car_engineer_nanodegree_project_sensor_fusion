@@ -129,3 +129,85 @@ Prominent features in the 3D point cloud which remain stable across different fr
 
 <p align="center"><img src="writeup/S3_F0_Point_Cloud_2_Detail_modified.png"/></p>
 <p align="center">Figure 17: Prominent features in the 3D point cloud [Sequence 3, Frame 0].</p>
+
+# Writeup: Sensor Fusion and Object Tracking (Final Project)
+
+The goal of the final project was to implement a processing pipeline to detect and track multiple objects over time using a sensor fusion algorithm. This task was split into the following sub-tasks:
+
+1) Implementation of an extended Kalman filter
+2) Implementation of the track management
+3) Implementation of the data association
+4) Implementation of the measurement model for the camera
+
+Below, a brief description of the different steps as well as some results can be found.
+
+## Implementation of an extended Kalman filter
+
+In the first sub-task an extended Kalman filter, i.e. the prediction and update step of the filter, had to be implemented. As the required equations where provided in the theoretical part of the training, it was basically straightforward to do the implementation.
+
+The most challenging part of this task was the derivation of the covariance matrix of the process noise (Q), as this matrix had to be derived doing some simple math. Again, the theoretical foundation was provided during the training. Hence, this sub-task was also straightforward.
+
+## Implementation of the track management
+
+The second sub-task was related to the implementation of the track management, i.e. the initialization of new tracks and the handling of already existing tracks. To be able to decide whether a track shall be kept or not, two main attributes were considered for each track, the track score, i.e. the confidence of a track being created on a real object, as well as the track state.
+
+Based on this information it was decided whether a track will be kept or deleted. Deletion usually happens when a track is not updated with new measurements anymore.
+
+## Implementation of the data association
+
+As long as only one track and only one measurement is available, it is fairly easy to do the data association. In case that multiple tracks and multiple sensor measurements are present, it has to be decided which measurement to associate with which track. This is usually done during a data association step which had to be implemented in the third sub-task.
+
+The starting point of the data association was the derivation of the association matrix, i.e. a matrix which contains a metric defining the distance between a track and a measurement. In this project, the Mahalanobis distance has been used.
+
+Based on the association matrix, a simple approach called "Simple Nearest Neighbor (SNN)" has been used to do the association of a measurement to a track. All tracks which have been updated with a measurement got an increased track score, i.e. the confidence of the track increased. In case a track did not get an update, the score was reduced. As soon as the score of a track dropped below a threshold, the track got deleted. Sensor measurements which have not been assigned to a track where used to create new tracks.
+
+To avoid associating a measurement to a track which is too far away, a gating has been implemented as well.
+
+## Implementation of the measurement model for the camera
+
+So far, measurements from a laser-scanner have been used only. In the fourth sub-task, the processing pipeline had to be extended to camera measurements. Hence, creating a sensor fusion system.
+
+The main activity in this step was the implementation of the non-linear measurement function, i.e. the projection of 3D world points onto the image plane. Additionally, a check whether a tracked object can be seen by the camera or not had to be implemented. This is required to decrease the score of a track, as this shall only be done if the object would be visible by the sensor in general.
+
+## Summary of the implementation
+
+In general, the implementation of all sub-tasks was pretty straightforward. This was basically for two reasons. On the one hand, the framework of the processing pipeline was given already and the different tasks were described in the code. This made it extremely easy to implement the missing parts. On the other hand, basically all concepts have been introduced during the lessons and have partly been covered by the coding examples already.
+
+## Benefits of sensor fusion
+
+In general, fusion systems do have benefits compared to systems using a single sensor only. In fusion systems, advantages of one sensor can be used to overcome shortcomings of other sensors. At nighttime for example, a camera does have a reduced performance as it relies on light reflected from objects. A laser-scanner for example does not suffer from this issue as it is an active sensor. Hence, combining those sensors will enable more scenarios to be covered.
+
+The same basically holds true for the visible field of view. The Velodyne laser-scanner used in this project is mounted on top of the vehicle. Hence, the close surroundings of the vehicle are not visible in the sensor's measurements. The camera can create measurements in the close surroundings of the vehicle and thus allows to detect objects in this area as well.
+
+Having different sensors which all contribute to the track score will reduce the time a track gets confirmed which will enable an earlier usage of the tracks in other vehicle functions like adaptive cruise control or an emergence brake assist.
+
+Regarding the detection accuracy, there is no significant improvement visible in the sequence used during this project. Figure 18 shows the RMSE of the system using the laser-scanner only, Figure 19 shows the RMSE of the fusion system. As can be seen, the RMSE of one track is slightly worse, the RMSE of the two other tracks is slightly better (please be aware that the track IDs differ in the two graphs).
+
+In Figure 19, a major drawback of the used setup can be seen. Track 11 corresponds to a vehicle which does have a longitudinal distance of about 50 m to the ego-vehicle. Thus, it is at the visibility range of the laser-scanner (artificially limited to 50 m in the Waymo Open Dataset). The track is initialized using measurements coming from the laser-scanner. Afterwards it is only detected by the camera which cannot properly estimate the longitudinal distance of the vehicle, resulting in a rather high RMSE of that track.
+
+<p align="center"><img src="writeup/S1_F0_to_200_RMSE.png"/></p>
+<p align="center">Figure 18: RMSE of tracked objects (lidar only) [Sequence 1, Frames 0-200].</p>
+
+<p align="center"><img src="writeup/S1_F0_to_200_RMSE_Fusion.png"/></p>
+<p align="center">Figure 19: RMSE of tracked objects (lidar and camera) [Sequence 1, Frames 0-200].</p>
+
+## Challenges of sensor fusion systems
+
+As mentioned in the previous section already and shown in Figure 19, challenges arise in case a measurement from a sensor with a high position accuracy is used to initialize a track but then the object cannot be seen by that sensor anymore. If the object is seen by another sensor with a lower position accuracy, e.g. a camera, the estimated position is rather inaccurate and could trigger an emergency brake system erroneously for example. Figure 20 shows such a scenario where track 11 has been set up using measurements from the laser-scanner but then the track leaves the field of view and is kept due to camera measurements, only resulting in a bad position estimate.
+
+<p align="center"><img src="writeup/S1_F70_Object_Tracking.png"/></p>
+<p align="center">Figure 20: Tracked objects (lidar and camera) [Sequence 1, Frame 70].</p>
+
+Additionally, the computational burden of processing the data from many sensors might be pretty high. This results in a high power consumption.
+
+## Improvements of the tracking results
+
+There are a couple of improvements possible to increase the tracking performance of the fusion system:
+
+- Parameter tuning: Tuning the parameters used might help to improve the tracking performance of the sensor fusion system.
+- Use vehicle's ego-motion: So far, the ego-motion of the vehicle is not considered although it does have an impact on the predicted position of the tracked vehicles.
+- Use more sophisticated motion model: The motion model used in the prediction step is rather generic. It does not consider constraints vehicles face while driving, e.g. that they cannot suddenly move to the side. This could for example be considered using a kinematic bicycle motion model.
+- Use combination of different motion models: Usually, it is hard to find a good parameter set for different kinds of motion (e.g., constant velocity, acceleration,...). Making use of an interacting multiple model Kalman filter could be used to take different "motions" into consideration.
+- Use more parameters: Currently, only the position and the velocity of the tracked objects is being used. It would be beneficial to add more parameters to the state vector. Especially the yaw angle might help to reduce sudden jumps in the object's orientation.
+- Use more sophisticated Kalman filter: As the camera model used is a non-linear model, it could be beneficial to make use of an unscented Kalman filter which usually can handle non-linear systems better than the extended Kalman filter can do.
+- Use more sophisticated data association method: In the scenarios used in the project, the data association was not too challenging. Especially when having many vehicles present in the scene, the "Simple Nearest Neighbor (SNN)" approach might not lead to good results. A more sophisticated approach could be used to solve this issue.
