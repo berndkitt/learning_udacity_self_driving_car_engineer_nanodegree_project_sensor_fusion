@@ -132,7 +132,11 @@ class Trackmanagement:
         thresh_initialized = params.delete_threshold_initialized
         
         for track in self.track_list:
-            if ((track.state == 'confirmed') and (track.score < thresh_confirmed)) or ((track.state == 'tentative') and (track.score < thresh_tentative)) or ((track.state == 'initialized') and (track.score < thresh_initialized)) or (track.P[0, 0] > params.max_P) or (track.P[1, 1] > params.max_P):
+            if ((track.state == 'confirmed') and (track.score < thresh_confirmed)) or \
+               ((track.state == 'tentative') and (track.score < thresh_tentative)) or \
+               ((track.state == 'initialized') and (track.score < thresh_initialized)) or \
+               (track.P[0, 0] > params.max_P) or \
+               (track.P[1, 1] > params.max_P):
                 self.delete_track(track)
 
         ############

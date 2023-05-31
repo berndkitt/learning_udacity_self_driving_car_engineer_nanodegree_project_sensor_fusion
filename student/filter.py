@@ -46,8 +46,6 @@ class Filter:
         ############
         # TODO Step 1: implement and return process noise covariance Q
         ############
-        Q = np.zeros((params.dim_state, params.dim_state))
-        
         dt = params.dt
         q_x = params.q
         q_y = params.q
@@ -65,18 +63,12 @@ class Filter:
         q_z_2 = 0.5 * dt**2 * q_z
         q_z_1 = dt * q_z
         
-        Q[0, 0] = q_x_3
-        Q[0, 3] = q_x_2
-        Q[1, 1] = q_y_3
-        Q[1, 4] = q_y_2
-        Q[2, 2] = q_z_3
-        Q[2, 5] = q_y_2
-        Q[3, 0] = q_x_2
-        Q[3, 3] = q_x_1
-        Q[4, 1] = q_y_2
-        Q[4, 4] = q_y_1
-        Q[5, 2] = q_z_2
-        Q[5, 5] = q_z_1
+        Q = np.matrix([[q_x_3, 0.0, 0.0, q_x_2, 0.0, 0.0],
+                       [0.0, q_y_3, 0.0, 0.0, q_y_2, 0.0],
+                       [0.0, 0.0, q_z_3, 0.0, 0.0, q_y_2],
+                       [q_x_2, 0.0, 0.0, q_x_1, 0.0, 0.0],
+                       [0.0, q_y_2, 0.0, 0.0, q_y_1, 0.0],
+                       [0.0, 0.0, q_z_2, 0.0, 0.0, q_z_1]])
 
         return Q
         

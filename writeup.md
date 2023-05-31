@@ -147,11 +147,21 @@ In the first sub-task an extended Kalman filter, i.e. the prediction and update 
 
 The most challenging part of this task was the derivation of the covariance matrix of the process noise (Q), as this matrix had to be derived doing some simple math. Again, the theoretical foundation was provided during the training. Hence, this sub-task was also straightforward.
 
+Figure 18 shows the RMSE of the tracked object over time.
+
+<p align="center"><img src="writeup/S2_F150_to_200_RMSE.png"/></p>
+<p align="center">Figure 18: RMSE of tracked object (lidar only) [Sequence 2, Frames 150-200].</p>
+
 ## Implementation of the track management
 
 The second sub-task was related to the implementation of the track management, i.e. the initialization of new tracks and the handling of already existing tracks. To be able to decide whether a track shall be kept or not, two main attributes were considered for each track, the track score, i.e. the confidence of a track being created on a real object, as well as the track state.
 
 Based on this information it was decided whether a track will be kept or deleted. Deletion usually happens when a track is not updated with new measurements anymore.
+
+Figure 19 shows the RMSE of the tracked object over time.
+
+<p align="center"><img src="writeup/S2_F65_to_100_RMSE.png"/></p>
+<p align="center">Figure 19: RMSE of tracked object (lidar only) [Sequence 2, Frames 65-100].</p>
 
 ## Implementation of the data association
 
@@ -181,22 +191,22 @@ The same basically holds true for the visible field of view. The Velodyne laser-
 
 Having different sensors which all contribute to the track score will reduce the time a track gets confirmed which will enable an earlier usage of the tracks in other vehicle functions like adaptive cruise control or an emergence brake assist.
 
-Regarding the detection accuracy, there is no significant improvement visible in the sequence used during this project. Figure 18 shows the RMSE of the system using the laser-scanner only, Figure 19 shows the RMSE of the fusion system. As can be seen, the RMSE of one track is slightly worse, the RMSE of the two other tracks is slightly better (please be aware that the track IDs differ in the two graphs).
+Regarding the detection accuracy, there is no significant improvement visible in the sequence used during this project. Figure 20 shows the RMSE of the system using the laser-scanner only, Figure 21 shows the RMSE of the fusion system. As can be seen, the RMSE of one track is slightly worse, the RMSE of the two other tracks is slightly better (please be aware that the track IDs differ in the two graphs).
 
-In Figure 19, a major drawback of the used setup can be seen. Track 11 corresponds to a vehicle which does have a longitudinal distance of about 50 m to the ego-vehicle. Thus, it is at the visibility range of the laser-scanner (artificially limited to 50 m in the Waymo Open Dataset). The track is initialized using measurements coming from the laser-scanner. Afterwards it is only detected by the camera which cannot properly estimate the longitudinal distance of the vehicle, resulting in a rather high RMSE of that track.
+In Figure 21, a major drawback of the used setup can be seen. Track 11 corresponds to a vehicle which does have a longitudinal distance of about 50 m to the ego-vehicle. Thus, it is at the visibility range of the laser-scanner (artificially limited to 50 m in the Waymo Open Dataset). The track is initialized using measurements coming from the laser-scanner. Afterwards it is only detected by the camera which cannot properly estimate the longitudinal distance of the vehicle, resulting in a rather high RMSE of that track.
 
 <p align="center"><img src="writeup/S1_F0_to_200_RMSE.png"/></p>
-<p align="center">Figure 18: RMSE of tracked objects (lidar only) [Sequence 1, Frames 0-200].</p>
+<p align="center">Figure 20: RMSE of tracked objects (lidar only) [Sequence 1, Frames 0-200].</p>
 
 <p align="center"><img src="writeup/S1_F0_to_200_RMSE_Fusion.png"/></p>
-<p align="center">Figure 19: RMSE of tracked objects (lidar and camera) [Sequence 1, Frames 0-200].</p>
+<p align="center">Figure 21: RMSE of tracked objects (lidar and camera) [Sequence 1, Frames 0-200].</p>
 
 ## Challenges of sensor fusion systems
 
-As mentioned in the previous section already and shown in Figure 19, challenges arise in case a measurement from a sensor with a high position accuracy is used to initialize a track but then the object cannot be seen by that sensor anymore. If the object is seen by another sensor with a lower position accuracy, e.g. a camera, the estimated position is rather inaccurate and could trigger an emergency brake system erroneously for example. Figure 20 shows such a scenario where track 11 has been set up using measurements from the laser-scanner but then the track leaves the field of view and is kept due to camera measurements, only resulting in a bad position estimate.
+As mentioned in the previous section already and shown in Figure 21, challenges arise in case a measurement from a sensor with a high position accuracy is used to initialize a track but then the object cannot be seen by that sensor anymore. If the object is seen by another sensor with a lower position accuracy, e.g. a camera, the estimated position is rather inaccurate and could trigger an emergency brake system erroneously for example. Figure 22 shows such a scenario where track 11 has been set up using measurements from the laser-scanner but then the track leaves the field of view and is kept due to camera measurements, only resulting in a bad position estimate.
 
 <p align="center"><img src="writeup/S1_F70_Object_Tracking.png"/></p>
-<p align="center">Figure 20: Tracked objects (lidar and camera) [Sequence 1, Frame 70].</p>
+<p align="center">Figure 22: Tracked objects (lidar and camera) [Sequence 1, Frame 70].</p>
 
 Additionally, the computational burden of processing the data from many sensors might be pretty high. This results in a high power consumption.
 
